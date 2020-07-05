@@ -60,9 +60,30 @@ namespace NzbMover
                     return;
                 }
 
+                // password section
+                string suffixToAdd = null;
+                string password = FileHelper.GetPassword(fi.Name);
+                output.WriteLine(Output.OutputType.Info, "Found password: {0}", password);
+
+                if (conf.Settings.ask_for_password && string.IsNullOrWhiteSpace(password))
+                {
+                    output.WriteStart(Output.OutputType.Warn, "No password detected. Please enter the password now: ");
+                    Console.ResetColor();
+                    string newPassword = Console.ReadLine().Trim();
+
+                    if (!string.IsNullOrWhiteSpace(newPassword))
+                    {
+                        password = newPassword;
+                        suffixToAdd = newPassword;
+                    }
+                    else
+                        output.WriteLine(Output.OutputType.Warn, "No password set.");
+                }
+
+                // begin the action
                 try {
                     // get target path
-                    string target = FileHelper.GetUniqueFilename(conf.Settings.target, fi, conf.Settings.allow_duplicates);
+                    string target = FileHelper.GetUniqueFilename(conf.Settings.target, fi, conf.Settings.allow_duplicates, suffixToAdd);
 
                     // time for some action
                     if(conf.Settings.action == Configuration.ConfigSettings.FileAction.MOVE)

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace NzbMover
@@ -17,11 +18,14 @@ namespace NzbMover
         /// <param name="allowDuplicates"></param>
         /// <exception cref="FileHelperAlreadyExists"></exception>
         /// <returns></returns>
-        public static string GetUniqueFilename(DirectoryInfo target, FileInfo source, bool allowDuplicates)
+        public static string GetUniqueFilename(DirectoryInfo target, FileInfo source, bool allowDuplicates, string suffixToAdd = null)
         {
             string folder = target.FullName;
             string fileName = Path.GetFileNameWithoutExtension(source.FullName);
             string ext = Path.GetExtension(source.FullName).TrimStart('.');
+
+            if (!string.IsNullOrWhiteSpace(suffixToAdd))
+                fileName = string.Format("{0}{1}", fileName, suffixToAdd);
 
             string fullFileName = System.IO.Path.Combine(folder, string.Format("{0}.{1}", fileName, ext));
 
@@ -49,6 +53,13 @@ namespace NzbMover
         public static string GetExePath()
         {
             return new FileInfo(System.Reflection.Assembly.GetEntryAssembly().Location).Directory.FullName;
+        }
+
+
+        public static string GetPassword(string fileName)
+        {
+            string regCode = @"\{\{(?<password>(.*))\}\}";
+            return Regex.Match(fileName, regCode).Groups["password"].Value;
         }
     }
 

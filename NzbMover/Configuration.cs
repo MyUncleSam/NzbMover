@@ -28,7 +28,8 @@ namespace NzbMover
                 action = (ConfigSettings.FileAction)Enum.Parse(typeof(ConfigSettings.FileAction), conf["SETTINGS"]["action"]),
                 allow_duplicates = Convert.ToBoolean(conf["SETTINGS"]["allow_duplicates"]),
                 close_success = Convert.ToInt32(conf["SETTINGS"]["close_success"]),
-                move_switch = Convert.ToBoolean(conf["SETTINGS"]["close_error"])
+                move_switch = Convert.ToBoolean(conf["SETTINGS"]["close_error"]),
+                ask_for_password = Convert.ToBoolean(conf["SETTINGS"]["ask_for_password"])
             };
         }
 
@@ -53,6 +54,7 @@ namespace NzbMover
             sb.AppendLine(string.Format("allow_duplicates = {0}", Settings.allow_duplicates));
             sb.AppendLine(string.Format("close_success = {0}", Settings.close_success));
             sb.AppendLine(string.Format("move_switch = {0}", Convert.ToBoolean(Settings.move_switch)));
+            sb.AppendLine(string.Format("ask_for_password = {0}", Convert.ToBoolean(Settings.ask_for_password)));
 
             sb.AppendLine(Output.GetSeperator());
             sb.AppendLine();
@@ -72,6 +74,7 @@ namespace NzbMover
             public bool allow_duplicates { get; set; }
             public int close_success { get; set; }
             public bool move_switch { get; set; }
+            public bool ask_for_password { get; set; }
 
             public enum FileAction
             {
