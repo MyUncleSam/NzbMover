@@ -1,4 +1,4 @@
-﻿# How to use
+# How to use
  - Copy the files to a folder.
  - Modify nzbmover.cfg to your needs.
  - (Optional, maybe better reed "Browser" below) Right click on a .nzb file and choose "Open with". Then choose this exe.
