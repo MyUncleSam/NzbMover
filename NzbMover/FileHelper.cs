@@ -35,7 +35,7 @@ namespace NzbMover
 
                 do
                 {
-                    fullFileName = System.IO.Path.Combine(folder, string.Format("{0} ({1}).{2}", fileName, counter++, ext));
+                    fullFileName = System.IO.Path.Combine(folder, string.Format("{1} - {0}.{2}", fileName, counter++, ext));
                 } while (File.Exists(fullFileName));
             }
 
