@@ -74,7 +74,7 @@ namespace NzbMover
                     if (!string.IsNullOrWhiteSpace(newPassword))
                     {
                         password = newPassword;
-                        suffixToAdd = newPassword;
+                        suffixToAdd = string.Format("{{{{{0}}}}}", newPassword);
                     }
                     else
                         output.WriteLine(Output.OutputType.Warn, "No password set.");
