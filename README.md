@@ -4,7 +4,6 @@
  - (Optional, maybe better reed "Browser" below) Right click on a .nzb file and choose "Open with". Then choose this exe.
 
  If all done all .nzb files should then be processed by this tool.
- But, as I have no clue about the icons, you get an ugly default exe icon. So maybe prefer setting it directly inside the browser. (See below.)
 
 # Browser
 If you download a file and open it, it first tries in the default application. But if there is none, it asks how to open. Choose the NzbMover.exe should work here.

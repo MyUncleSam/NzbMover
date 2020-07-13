@@ -29,7 +29,8 @@ namespace NzbMover
                 allow_duplicates = Convert.ToBoolean(conf["SETTINGS"]["allow_duplicates"]),
                 close_success = Convert.ToInt32(conf["SETTINGS"]["close_success"]),
                 move_switch = Convert.ToBoolean(conf["SETTINGS"]["close_error"]),
-                ask_for_password = Convert.ToBoolean(conf["SETTINGS"]["ask_for_password"])
+                ask_for_password = Convert.ToBoolean(conf["SETTINGS"]["ask_for_password"]),
+                password_extraction_method = (ConfigSettings.PasswordExtractionMethod)Enum.Parse(typeof(ConfigSettings.PasswordExtractionMethod), conf["SETTINGS"]["password_extraction_method"])
             };
         }
 
@@ -55,6 +56,7 @@ namespace NzbMover
             sb.AppendLine(string.Format("close_success = {0}", Settings.close_success));
             sb.AppendLine(string.Format("move_switch = {0}", Convert.ToBoolean(Settings.move_switch)));
             sb.AppendLine(string.Format("ask_for_password = {0}", Convert.ToBoolean(Settings.ask_for_password)));
+            sb.AppendLine(string.Format("password_extraction_method = {0}", Settings.password_extraction_method.ToString()));
 
             sb.AppendLine(Output.GetSeperator());
             sb.AppendLine();
@@ -75,11 +77,21 @@ namespace NzbMover
             public int close_success { get; set; }
             public bool move_switch { get; set; }
             public bool ask_for_password { get; set; }
+            public PasswordExtractionMethod password_extraction_method { get; set; }
 
             public enum FileAction
             {
                 MOVE,
                 COPY
+            }
+
+            public enum PasswordExtractionMethod
+            {
+                None,
+                OnlyName,
+                OnlyNzbMetadata,
+                FilenameOverNzbMetadata,
+                NzbMetadataOverFilename
             }
         }
     }

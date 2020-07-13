@@ -1,7 +1,9 @@
 ﻿using Alphaleonis.Win32.Filesystem;
+using Nzb;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -55,11 +57,85 @@ namespace NzbMover
             return new FileInfo(System.Reflection.Assembly.GetEntryAssembly().Location).Directory.FullName;
         }
 
+        /// <summary>
+        /// tries to get the password, first from filename and then from nzb metainformation
+        /// </summary>
+        /// <param name="fi"></param>
+        /// <returns></returns>
+        public static string GetPassword(FileInfo fi, Configuration.ConfigSettings.PasswordExtractionMethod method)
+        {
+            if (method == Configuration.ConfigSettings.PasswordExtractionMethod.None)
+                return null;
 
-        public static string GetPassword(string fileName)
+            // extract both passwords
+            string pwFilename = GetFileNamePassword(fi.Name);
+            string pwNzb = GetNzbPassword(fi.FullName);
+
+            // use the method provided
+            switch (method)
+            {
+                case Configuration.ConfigSettings.PasswordExtractionMethod.OnlyName:
+                    return pwFilename;
+                case Configuration.ConfigSettings.PasswordExtractionMethod.OnlyNzbMetadata:
+                    return pwNzb;
+                case Configuration.ConfigSettings.PasswordExtractionMethod.FilenameOverNzbMetadata:
+                    if (!string.IsNullOrWhiteSpace(pwFilename))
+                        return pwFilename;
+
+                    return pwNzb;
+                case Configuration.ConfigSettings.PasswordExtractionMethod.NzbMetadataOverFilename:
+                    if (!string.IsNullOrWhiteSpace(pwNzb))
+                        return pwNzb;
+
+                    return pwFilename;
+                default:
+                    throw new NotImplementedException("Unknown password extraction method provided.");
+            }
+        }
+
+        /// <summary>
+        /// tries to get the password from filename
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public static string GetFileNamePassword(string fileName)
         {
             string regCode = @"\{\{(?<password>(.*))\}\}";
-            return Regex.Match(fileName, regCode).Groups["password"].Value;
+            string ret = Regex.Match(fileName, regCode).Groups["password"].Value;
+
+            if (!string.IsNullOrWhiteSpace(ret))
+                return ret;
+
+            return null;
+        }
+
+        /// <summary>
+        /// tries to get the password from nzb file
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static string GetNzbPassword(string filePath)
+        {
+            string ret = null;
+
+            try
+            {
+                using (System.IO.FileStream fsNzb = File.OpenRead(filePath))
+                {
+                    Task<NzbDocument> tDoc = NzbDocument.Load(fsNzb);
+                    tDoc.Wait();
+                    NzbDocument nDoc = tDoc.Result;
+
+                    if (nDoc.Metadata.Any(a => a.Key.Equals("password", StringComparison.OrdinalIgnoreCase)))
+                        ret = nDoc.Metadata.First(f => f.Key.Equals("password", StringComparison.OrdinalIgnoreCase)).Value;
+                }
+            }
+            catch { }
+
+            if (!string.IsNullOrWhiteSpace(ret))
+                return ret;
+
+            return null;
         }
     }
 

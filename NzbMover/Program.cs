@@ -13,6 +13,9 @@ namespace NzbMover
         {
             Output output = new Output();
             Configuration conf = null;
+            Version version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
+
+            output.WriteLine(Output.OutputType.Info, "Program version: {0}", version.ToString());
 
             try
             {
@@ -62,19 +65,24 @@ namespace NzbMover
 
                 // password section
                 string suffixToAdd = null;
-                string password = FileHelper.GetPassword(fi.Name);
-                output.WriteLine(Output.OutputType.Info, "Found password: {0}", password);
+                output.WriteStart(Output.OutputType.Info, "Extracting password ... ");
+                string password = FileHelper.GetPassword(fi, conf.Settings.password_extraction_method);
+
+                if (string.IsNullOrWhiteSpace(password))
+                    output.WriteEnd(Output.OutputType.Warn, "no password found.");
+                else
+                    output.WriteEnd(Output.OutputType.Success, "DONE ({0})", password);
 
                 if (conf.Settings.ask_for_password && string.IsNullOrWhiteSpace(password))
                 {
-                    output.WriteStart(Output.OutputType.Warn, "No password detected. Please enter the password now: ");
-                    Console.ResetColor();
+                    output.WriteStart(Output.OutputType.Warn, "Set password (or press enter for none): ");
+                    Console.ResetColor(); // reset color to have white input for the user
                     string newPassword = Console.ReadLine().Trim();
 
                     if (!string.IsNullOrWhiteSpace(newPassword))
                     {
                         password = newPassword;
-                        suffixToAdd = string.Format("{{{{{0}}}}}", newPassword);
+                        suffixToAdd = string.Format("{{{{{0}}}}}", newPassword); // create the password suffix {{pw}}
                     }
                     else
                         output.WriteLine(Output.OutputType.Warn, "No password set.");
