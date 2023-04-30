@@ -1,4 +1,4 @@
-﻿using Alphaleonis.Win32.Filesystem;
+﻿using System.IO;
 using Nzb;
 using System;
 using System.Collections.Generic;
@@ -16,15 +16,15 @@ namespace NzbMover
         /// gets a unique target path to copy files to (with allow duplicates options
         /// </summary>
         /// <param name="target"></param>
-        /// <param name="source"></param>
+        /// <param name="fileFullName"></param>
         /// <param name="allowDuplicates"></param>
         /// <exception cref="FileHelperAlreadyExists"></exception>
         /// <returns></returns>
-        public static string GetUniqueFilename(DirectoryInfo target, FileInfo source, bool allowDuplicates, string suffixToAdd = null)
+        public static string GetUniqueFilename(DirectoryInfo target, string fileFullName, bool allowDuplicates, string suffixToAdd = null)
         {
             string folder = target.FullName;
-            string fileName = Path.GetFileNameWithoutExtension(source.FullName);
-            string ext = Path.GetExtension(source.FullName).TrimStart('.');
+            string fileName = Path.GetFileNameWithoutExtension(fileFullName);
+            string ext = Path.GetExtension(fileFullName).TrimStart('.');
 
             if (!string.IsNullOrWhiteSpace(suffixToAdd))
                 fileName = string.Format("{0}{1}", fileName, suffixToAdd);
@@ -46,6 +46,39 @@ namespace NzbMover
             }
 
             return fullFileName;
+        }
+
+        /// <summary>
+        /// makes sure that the name is not too long
+        /// </summary>
+        /// <param name="fi"></param>
+        /// <param name="maxNameLength"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public static string GetFilenameLimitedSize(FileInfo fi, int maxNameLength, string password)
+        {
+            string fileName = Path.GetFileName(fi.FullName);
+
+            if(fileName.Length <= maxNameLength)
+            {
+                return fi.FullName;
+            }
+
+            string folder = Path.GetDirectoryName(fi.FullName);
+            string name = Path.GetFileNameWithoutExtension(fi.FullName);
+            string ext = Path.GetExtension(fi.FullName).TrimStart('.');
+
+            int nameCharsCount = maxNameLength - ext.Length - 1 - password.Length - 4;
+
+            if(nameCharsCount < 0)
+            {
+                nameCharsCount = 0;
+            }
+
+            string pwStart = "{{";
+            string pwEnd = "}}";
+
+            return Path.Combine(folder, $"{name.Substring(0, nameCharsCount)}{pwStart}{password}{pwEnd}.{ext}");
         }
 
         /// <summary>

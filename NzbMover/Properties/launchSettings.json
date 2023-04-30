@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NzbMover": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\stefa\\Downloads\\One.Piece.S15E01.Der.Start.des.neuen.Kapitels.Die.Strohhut-Bande.wieder.versammelt.German.AC3.720p.WEBRip.x265-FuN{{DYSnZQAMN3WRqTyl2eJrH4}}.nzb\""
+    }
+  }
+}

@@ -1,7 +1,8 @@
-﻿using Alphaleonis.Win32.Filesystem;
+﻿using System.IO;
 using IniParser;
 using IniParser.Model;
 using System;
+using System.IO;
 using System.Text;
 using System.Threading;
 
@@ -90,8 +91,11 @@ namespace NzbMover
 
                 // begin the action
                 try {
+                    // target filename
+                    string targetFileName = FileHelper.GetFilenameLimitedSize(fi, conf.Settings.file_name_max_length, password);
+
                     // get target path
-                    string target = FileHelper.GetUniqueFilename(conf.Settings.target, fi, conf.Settings.allow_duplicates, suffixToAdd);
+                    string targetFilePath = FileHelper.GetUniqueFilename(conf.Settings.target, targetFileName, conf.Settings.allow_duplicates, suffixToAdd);
 
                     // time for some action
                     if(conf.Settings.action == Configuration.ConfigSettings.FileAction.MOVE)
@@ -99,7 +103,7 @@ namespace NzbMover
                         try
                         {
                             output.WriteStart(Output.OutputType.Info, "Moving file ... ");
-                            Alphaleonis.Win32.Filesystem.File.Move(fi.FullName, target);
+                            File.Move(fi.FullName, targetFilePath);
                             output.WriteEnd(Output.OutputType.Success, "DONE.");
                         }
                         catch(Exception ex)
@@ -117,7 +121,7 @@ namespace NzbMover
                         // copy file (try to even copy it if file is locked by another application)
                         using (System.IO.FileStream fsSource = File.Open(fi.FullName, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite))
                         {
-                            using (System.IO.FileStream fsTarget = new System.IO.FileStream(target, System.IO.FileMode.Create))
+                            using (System.IO.FileStream fsTarget = new System.IO.FileStream(targetFilePath, System.IO.FileMode.Create))
                             {
                                 byte[] buffer = new byte[0x10000];
                                 int bytes;

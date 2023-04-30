@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-//using System.IO;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using IniParser;
 using IniParser.Model;
-using Alphaleonis.Win32.Filesystem;
 
 namespace NzbMover
 {
@@ -30,7 +29,8 @@ namespace NzbMover
                 close_success = Convert.ToInt32(conf["SETTINGS"]["close_success"]),
                 move_switch = Convert.ToBoolean(conf["SETTINGS"]["close_error"]),
                 ask_for_password = Convert.ToBoolean(conf["SETTINGS"]["ask_for_password"]),
-                password_extraction_method = (ConfigSettings.PasswordExtractionMethod)Enum.Parse(typeof(ConfigSettings.PasswordExtractionMethod), conf["SETTINGS"]["password_extraction_method"])
+                password_extraction_method = (ConfigSettings.PasswordExtractionMethod)Enum.Parse(typeof(ConfigSettings.PasswordExtractionMethod), conf["SETTINGS"]["password_extraction_method"]),
+                file_name_max_length = Convert.ToInt32(conf["SETTINGS"]["file_name_max_length"])
             };
         }
 
@@ -78,6 +78,7 @@ namespace NzbMover
             public bool move_switch { get; set; }
             public bool ask_for_password { get; set; }
             public PasswordExtractionMethod password_extraction_method { get; set; }
+            public int file_name_max_length { get; set; }
 
             public enum FileAction
             {
